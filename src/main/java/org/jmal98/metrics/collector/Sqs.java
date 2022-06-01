@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.regions.DefaultAwsRegionProviderChain;
+import com.amazonaws.auth.WebIdentityTokenCredentialsProvider;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.GetQueueAttributesResult;
@@ -42,11 +43,13 @@ public class Sqs extends Collector {
 				if (queueEndpoint != null) {
 					sqs = AmazonSQSClientBuilder
 						.standard()
+						.withCredentials(WebIdentityTokenCredentialsProvider.create())
 						.withEndpointConfiguration(new EndpointConfiguration(queueEndpoint, region))
 					.build();
 				} else {
 					sqs = AmazonSQSClientBuilder
 						.standard()
+						.withCredentials(WebIdentityTokenCredentialsProvider.create())
 						.withRegion(region)
 					.build();
 				}
