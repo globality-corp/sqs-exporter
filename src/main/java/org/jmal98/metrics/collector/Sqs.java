@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.amazonaws.services.sqs.model.ListQueuesRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -72,9 +73,17 @@ public class Sqs extends Collector {
 				queueUrls.add(sqs.getQueueUrl(name).getQueueUrl());
 			    }
 			} else {
+				ListQueuesRequest listQueuesRequest = new ListQueuesRequest();
+				listQueuesRequest.setMaxResults(1000);
+				listQueuesRequest.setQueueNamePrefix(queueNamePrefix);
 			    // get URLs for all queues visible to this account (with prefix if specified)
-			    ListQueuesResult queues = sqs.listQueues(queueNamePrefix); //If null is passed in the whole unfiltered list is returned
+			    ListQueuesResult queues = sqs.listQueues(listQueuesRequest); //If null is passed in the whole unfiltered list is returned
 			    queueUrls = queues.getQueueUrls();
+				while (queues.getNextToken() != null) {
+					listQueuesRequest.setNextToken(queues.getNextToken());
+					queues = sqs.listQueues(listQueuesRequest);
+					queueUrls.addAll(queues.getQueueUrls());
+				}
 			}
 
 			for (String qUrl : queueUrls) {
