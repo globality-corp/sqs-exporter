@@ -1,0 +1,7 @@
+{
+  "params": {
+    "name": "sqs-exporter"
+  },
+  "type": "java-service",
+  "version": "2024.52.0"
+}
